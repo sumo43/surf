@@ -34,7 +34,10 @@
             <h1> Surf search </h1>
             <div class="col">
                 {% for key in _cache.keys() %}
-                    <p> count: {{ _cache[key] }} url: {{ key }} </p>
+                    <p> url: {{ key }} </p>
+                    {% for url in _cache[key] %} 
+                        <p> links to: {{ url }} </p>
+                    {% endfor %}
                 {% endfor %}
             </div>
 

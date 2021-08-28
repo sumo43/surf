@@ -1,12 +1,13 @@
 from flask import Flask, request, render_template
 from store import Store
 from urllib.parse import urlparse
-
+from spider import SurfSpider
 
 cache = Store()
 
-
 _cache = dict()
+
+spider = SurfSpider(_cache)
 
 app = Flask(__name__)
 
@@ -19,6 +20,11 @@ def index():
 @app.route('/urls', methods=["GET", "POST"])
 def root_handler():
 
+
+    global _cache
+    global cache
+    global spider
+
     url = request.args.get('url')
 
     parser = urlparse(url)
@@ -27,22 +33,23 @@ def root_handler():
     if('0.0.0.0' in url):
         return "bad url, skipping..."
      
-    print(parser.scheme)
-    print(parser.netloc)
     parsed_url = parser.scheme + "://" + parser.netloc
 
-
     print("the url is " + parsed_url)
-
 
     # this _cache is no good
     # make a better cache
 
-
     if parsed_url in _cache:
-        _cache[parsed_url] += 1
+        _cache[parsed_url] += []
     else:
-        _cache[parsed_url] = 1
+        _cache[parsed_url] = []
+
+    spider.push_url(parsed_url)
+
+
+    _cache = spider.get_cache()
+    print(_cache)
 
     # cache.push_url(parsed_url)
     # receive root
