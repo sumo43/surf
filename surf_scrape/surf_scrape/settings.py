@@ -12,6 +12,7 @@ BOT_NAME = 'surf_scrape'
 SPIDER_MODULES = ['surf_scrape.spiders']
 NEWSPIDER_MODULE = 'surf_scrape.spiders'
 
+USERAGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0) Gecko/20100101 Firefox/91.0"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'surf_scrape (+http://www.yourdomain.com)'
