@@ -12,37 +12,86 @@ class SurfSpider(CrawlSpider):
     SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
     CONCURRENT_REQUESTS = 100
 
+
+    # TODO make this better
+    # crawl outbound links up to this depth, to form a graph (hopefully)
+    # depth 0-2 is already a lot of links, so that's all we're doing for now
+    crawl_depth = 0
+
     # TODO figure out how to crawl external links only, maybe through rules?
     rules = (
         Rule(LinkExtractor(allow=('amazon',))),
         Rule(LinkExtractor(allow=('prime',)))
     )
 
-    urls = []
+    # a dict representing the connections between the urls
+    urls = dict()
 
     def __init__(self):
         super(CrawlSpider, self).__init__()
 
-        self.urls.append("https://microsoft.com")
 
 
     def start_requests(self):
 
-        for url in self.urls:
-            yield scrapy.Request(url=url, callback=self.parse)
+        test_url = "https://google.com"
 
+        self.push_url(test_url)
+
+        yield scrapy.Request(url=test_url, callback=self.parse)
+
+    # TODO figure out how to crawl external links only, maybe through rules?
+    # TODO figure out how to crawl amazon + other sites with robots.txt
+    # can use a proxy, or make it look like a real user somehow?
+    # rate limit?
 
     def push_url(self, url):
-        print("push url called")
-        current_url = url
-        yield scrapy.Request(url=url, callback=self.parse)
+        if(self.crawl_depth < 3 and url not in self.urls.keys()):
+            yield scrapy.Request(
+                url=url, 
+                headers={'User-Agent': 'Mozilla/5.0'},
+                usercallback=self.parse
+            )
+        else:
+            self.crawl_depth = 0
+            return
 
     def parse(self, response):
         self.logger.info("Currently on page: %s", response.url)
 
-        print("response xpath")
-        print(response.xpath('//a'))
+        source_url = response.url
+        source_parser = urlparse(source_url)
+        source_url_netloc = source_parser.netloc
+
+
+        self.urls[source_url] = []
+
+        out_links = []
+
+        for a in response.xpath('//a/@href'):
+
+            url = a.get()
+            parser = urlparse(url)
+            url_netloc = parser.netloc
+            if(url_netloc != ''):
+                # has a netloc
+
+                # check if the url is "external" (includes local subdomains, e.g. maps.google.com)
+                if(url_netloc != source_url_netloc):
+                    full_url = parser.scheme + "://" + parser.netloc
+                    out_links.append(full_url)
+
+            else:
+                # doesnt have a netloc
+                print("doesnt have netloc: " + url)
         
+        for link in out_links:
+            # add the outbound link to the "graph"
+            urls[source_url].append(link)
+
+            # crawl the outbound link
+            self.crawl_depth += 1
+            push_url(link)
 
     def get_cache(self):
         return self._cache
