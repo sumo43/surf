@@ -12,7 +12,15 @@ BOT_NAME = 'surf_scrape'
 SPIDER_MODULES = ['surf_scrape.spiders']
 NEWSPIDER_MODULE = 'surf_scrape.spiders'
 
-USERAGENT = "Mozilla/5.0"
+DOWNLOADER_MIDDLEWARES = {
+    'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
+    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware': 110,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware' : None,
+}
+
+USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.93 Safari/537.36"
+
+DOWNLOAD_DELAY = 0.25
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'surf_scrape (+http://www.yourdomain.com)'

@@ -20,7 +20,6 @@ def index():
 @app.route('/urls', methods=["GET", "POST"])
 def root_handler():
 
-
     global _cache
     global cache
     global spider

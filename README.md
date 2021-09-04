@@ -1,8 +1,3 @@
-
-
-
-
-
 # Surf Pi client
 
 util.py
@@ -24,9 +19,24 @@ server.py
 
 
 # Web Crawler
-    - Beautiful Soup 4
-    - This is what actually adds to the database
-    
+
+    Scrapy Web Crawler, run through github workflow later
+
+    Hour Session
+- Attempt to use signals to debug the crawler, get it to work
+    - built in support for robots.txt, user-agent spoofing
+- Look into amazon s3 storage or fileserver to store the crawled data
+- Look into what you want to store / what you need
+    - name, desc of website
+    - google analytics data of website through API?
+    - Format (JSON, Table?)
+
+   
+
+    Bonus Features
+    - Option to crawl sitemap for faster crawling
+
+
 # SQL server on Pi
 
 - Implement schema for SQL server

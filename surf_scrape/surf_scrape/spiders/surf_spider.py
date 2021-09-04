@@ -8,6 +8,8 @@ from scrapy import signals
 class SurfSpider(CrawlSpider):
 
     name = "surf_spider"
+    
+    
 
     # config for spider that only crawls external links
     SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
@@ -24,7 +26,7 @@ class SurfSpider(CrawlSpider):
         Rule(LinkExtractor(allow=('prime',)))
     )
 
-    MAX_DEPTH = 3
+    MAX_DEPTH = 5
     
     # a dict representing the connections between the urls
     urls = dict()
@@ -39,7 +41,7 @@ class SurfSpider(CrawlSpider):
 
     def start_requests(self):
 
-        test_url = "www.facebook.com"
+        test_url = "www.amazon.com"
 
         self.urls[test_url] = dict()
         self.initialize_data(test_url, 0)
@@ -53,13 +55,15 @@ class SurfSpider(CrawlSpider):
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
-        spider = super(SurfSpider, cls).from_crawler(crawler, *args, **kwargs)
+        spider = super(CrawlSpider, cls).from_crawler(crawler, *args, **kwargs)
         crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
 
     def spider_closed(self, spider):
-        spider.logger.info("spider closed, bottom text")
-        self.crawler_finished()
-        
+        spider.logger.info("spider closed %s", spider.name)
+        print(self.urls)
+        self.crawl_finished()
+       
 
 
     # TODO figure out how to crawl external links only, maybe through rules?
@@ -68,7 +72,7 @@ class SurfSpider(CrawlSpider):
     # rate limit?
 
     def crawl_url(self, url):
-        if(self.urls[url]['depth'] < 3):
+        if(self.urls[url]['depth'] < MAX_DEPTH):
             yield scrapy.Request(
                 url=url, 
                 headers={'User-Agent': 'Mozilla/5.0'},
@@ -95,10 +99,7 @@ class SurfSpider(CrawlSpider):
             print("buggy url")
             return
 
-
-
         self.logger.info("Currently on page: %s", response.url)
-
 
         depth = self.urls[source_url_netloc]['depth']
 
@@ -149,9 +150,6 @@ class SurfSpider(CrawlSpider):
                         errback=self.error_handler
                     )
 
-                else:
-                    print("-------------crawl finished-------------")
-                    self.crawl_finished()
 
     def unparse(self, link):
         unparsed_link = "https://"
