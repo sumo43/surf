@@ -1,3 +1,4 @@
+
 class Node:
     
     def __init__(self, url: str):
@@ -6,11 +7,6 @@ class Node:
     def get_url(self):
         return self.url
         
-
-
-
-
-
 class Store:
 
     def __init__(self):

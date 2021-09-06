@@ -5,34 +5,44 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 from scrapy import signals
 
+from store_data import StoreData
+
 class SurfSpider(CrawlSpider):
 
     name = "surf_spider"
-    
-    
-
-    # config for spider that only crawls external links
-    SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
-    CONCURRENT_REQUESTS = 100
 
     # TODO make this better
     # crawl outbound links up to this depth, to form a graph (hopefully)
     # depth 0-2 is already a lot of links, so that's all we're doing for now
-    crawl_depth = 0
+    # now using depth middleware
+   
 
     # TODO figure out how to crawl external links only, maybe through rules?
+    # TODO figure out how to use rule to only crawl external links
+
+
+    # TODO figure out how to crawl amazon + other sites with robots.txt
+    # can use a proxy, or make it look like a real user somehow?
+    # rate limit?
+
+    # TODO look into ip ban
+
     rules = (
         Rule(LinkExtractor(allow=('amazon',))),
         Rule(LinkExtractor(allow=('prime',)))
     )
 
-    MAX_DEPTH = 5
+    
+
     
     # a dict representing the connections between the urls
     urls = dict()
 
-    def __init__(self):
-        print("spider initialized")
+    # root (starting) url
+    root_url = None
+
+    def __init__(self, root_url):
+        self.root_url = root_url
 
 
     def error_handler(self, err):
@@ -41,18 +51,19 @@ class SurfSpider(CrawlSpider):
 
     def start_requests(self):
 
-        test_url = "www.amazon.com"
 
-        self.urls[test_url] = dict()
-        self.initialize_data(test_url, 0)
+        self.urls[root_url] = dict()
+        self.initialize_data(root_url, 0)
 
         yield scrapy.Request(
-            url=self.unparse(test_url), 
+            url=self.unparse(root_url),
             headers = {'User-Agent': 'Mozilla/5.0'},
             callback=self.parse,
             errback=self.error_handler
         )
+    
 
+    # use callback with spider_closed signal
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(CrawlSpider, cls).from_crawler(crawler, *args, **kwargs)
@@ -61,15 +72,9 @@ class SurfSpider(CrawlSpider):
 
     def spider_closed(self, spider):
         spider.logger.info("spider closed %s", spider.name)
-        print(self.urls)
         self.crawl_finished()
        
-
-
-    # TODO figure out how to crawl external links only, maybe through rules?
-    # TODO figure out how to crawl amazon + other sites with robots.txt
-    # can use a proxy, or make it look like a real user somehow?
-    # rate limit?
+    
 
     def crawl_url(self, url):
         if(self.urls[url]['depth'] < MAX_DEPTH):
@@ -83,7 +88,6 @@ class SurfSpider(CrawlSpider):
             print("maximum crawl depth exceeded")
             self.crawl_depth = 0
             return
-    
 
     def parse(self, response):
 
@@ -124,6 +128,7 @@ class SurfSpider(CrawlSpider):
                     out_links.append(url_netloc)
 
                 # else doesnt have a netloc
+
         
         
         for link in out_links:
@@ -141,14 +146,13 @@ class SurfSpider(CrawlSpider):
                 self.urls[link] = dict()
                 self.initialize_data(link, depth + 1)
 
-                if(depth < self.MAX_DEPTH):
 
-                    yield scrapy.Request(
-                        url=self.unparse(link), 
-                        headers={'User-Agent': 'Mozilla/5.0'},
-                        callback=self.parse,
-                        errback=self.error_handler
-                    )
+                yield scrapy.Request(
+                    url=self.unparse(link), 
+                    headers={'User-Agent': 'Mozilla/5.0'},
+                    callback=self.parse,
+                    errback=self.error_handler
+                )
 
 
     def unparse(self, link):
@@ -164,10 +168,9 @@ class SurfSpider(CrawlSpider):
     def crawl_finished(self):
         # crawl is finished
 
-        [print() for i in range(5)]
-        print("urls dict ------------------------") 
-        print(self.urls)
-        [print() for i in range(5)]
+        StoreData(self.urls)
+          
+        
 
     def get_cache(self):
         return self._cache
@@ -184,7 +187,7 @@ class SurfSpider(CrawlSpider):
 
         return
 
-if __name__ == "__main__":
+def runSpider():
     test_cache = dict()
     test_cache['amazon.com'] = []
     process = CrawlerProcess( {
@@ -192,4 +195,8 @@ if __name__ == "__main__":
     })
     process.crawl(SurfSpider, dict())
     process.start()
-        
+
+
+
+if __name__ == "__main__":
+          

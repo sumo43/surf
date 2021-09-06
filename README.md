@@ -1,6 +1,7 @@
 # Surf Pi client
 
 util.py
+
 - Url data structure for URL
     - figure out which metadata you want
     - make this a dictionary, which will go into our list later
@@ -22,14 +23,19 @@ server.py
 
     Scrapy Web Crawler, run through github workflow later
 
-    Hour Session
-- Attempt to use signals to debug the crawler, get it to work
-    - built in support for robots.txt, user-agent spoofing
 - Look into amazon s3 storage or fileserver to store the crawled data
 - Look into what you want to store / what you need
     - name, desc of website
     - google analytics data of website through API?
     - Format (JSON, Table?)
+
+
+# Web Crawler Pipeline
+- Flask app calls Crawler
+(Data from crawler) -> format_data.py -> matrix for pagerank -> mat.csv
+                                      -> website metadata (later) -> meta.json
+                                      -> schema.json for pagerank schema
+
 
    
 
