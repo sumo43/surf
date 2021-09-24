@@ -4,8 +4,10 @@ from urllib.parse import urlparse
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 from scrapy import signals
+import json
+import random
 
-from store_data import StoreData
+from .store_data import StoreData
 
 class SurfSpider(CrawlSpider):
 
@@ -27,41 +29,39 @@ class SurfSpider(CrawlSpider):
 
     # TODO look into ip ban
 
-    rules = (
-        Rule(LinkExtractor(allow=('amazon',))),
-        Rule(LinkExtractor(allow=('prime',)))
-    )
-
-    
-
-    
     # a dict representing the connections between the urls
     urls = dict()
 
-    # root (starting) url
+    # root (starting) ur
     root_url = None
 
-    def __init__(self, root_url):
-        self.root_url = root_url
+    # list of random proxies to not get blocked
+    proxies_list = []
 
+    def __init__(self, root_url='www.amazon.com'):
+        self.root_url = root_url
 
     def error_handler(self, err):
         print("an error happened")
 
-
     def start_requests(self):
 
+        self.init_random_proxy()
+        random_proxy = self.get_random_proxy()
 
-        self.urls[root_url] = dict()
-        self.initialize_data(root_url, 0)
+        self.urls[self.root_url] = dict()
+        self.initialize_data(self.root_url, 0)
 
-        yield scrapy.Request(
-            url=self.unparse(root_url),
+        req =  scrapy.Request(
+            url=self.unparse(self.root_url),
             headers = {'User-Agent': 'Mozilla/5.0'},
             callback=self.parse,
-            errback=self.error_handler
+            errback=self.error_handler,
         )
-    
+
+        req.meta['proxy'] = random_proxy
+
+        yield req
 
     # use callback with spider_closed signal
     @classmethod
@@ -73,8 +73,6 @@ class SurfSpider(CrawlSpider):
     def spider_closed(self, spider):
         spider.logger.info("spider closed %s", spider.name)
         self.crawl_finished()
-       
-    
 
     def crawl_url(self, url):
         if(self.urls[url]['depth'] < MAX_DEPTH):
@@ -90,17 +88,17 @@ class SurfSpider(CrawlSpider):
             return
 
     def parse(self, response):
+        print("AAA")
 
         # parse the source url...
         source_url = response.url
         source_parser = urlparse(source_url)
         source_url_netloc = source_parser.netloc
 
-
         # ignore sites that have a different response from the link
         if(source_url_netloc not in self.urls.keys()):
+            print(self.urls.keys())
             print(source_url_netloc)
-            print("buggy url")
             return
 
         self.logger.info("Currently on page: %s", response.url)
@@ -108,6 +106,8 @@ class SurfSpider(CrawlSpider):
         depth = self.urls[source_url_netloc]['depth']
 
         out_links = []
+        print(response.xpath("//a/@href"))
+        print(response.text)
 
         for a in response.xpath('//a/@href'):
             
@@ -187,6 +187,20 @@ class SurfSpider(CrawlSpider):
 
         return
 
+    def init_random_proxy(self):
+        with open('proxies.json') as proxies_json:
+            proxies = json.load(proxies_json)
+
+            for proxy in proxies:
+                new_proxy = proxy['ip'] + ":" + proxy['port']
+                self.proxies_list.append(proxy['ip'] + ":" + proxy['port'])
+
+    
+    def get_random_proxy(self):
+
+        rand_ind = random.randrange(0, len(self.proxies_list))
+        return self.proxies_list[rand_ind]
+
 def runSpider():
     test_cache = dict()
     test_cache['amazon.com'] = []
@@ -197,6 +211,3 @@ def runSpider():
     process.start()
 
 
-
-if __name__ == "__main__":
-          

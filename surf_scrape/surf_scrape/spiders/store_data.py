@@ -1,6 +1,6 @@
 import numpy as np
 import pickle
-from os import file
+import os
 
 class StoreData():
 
@@ -19,18 +19,14 @@ class StoreData():
     # "cleaned" meta dict 
     cleaned_dict = None
 
-    meta_path = file.join(data_dir, meta_file)
-    schema_path = file.join(schema_dir, schema_file)
-    matrix_path = file.join(matrix_dir, matrix_file)
-
+    meta_path = os.path.join(data_dir, meta_file)
+    schema_path = os.path.join(data_dir, schema_file)
+    matrix_path = os.path.join(data_dir, matrix_file)
 
     def __init__(self, crawl_data):
 
         self.crawl_data = crawl_data
-        print(crawl_data)
-        
-    
-    
+
     # store cleaned meta data in meta_file
     def store_meta(self):
         return None
@@ -41,13 +37,12 @@ class StoreData():
         return None
 
     # store schema in json 
-    def store_scheme(self):
+    def store_schema(self):
         return None
 
     # generate numpy matrix of websites from pagerank
     def generate_matrix(self):
         return None
-
 
     # store matrix in csv form
     def store_matrix(self):
