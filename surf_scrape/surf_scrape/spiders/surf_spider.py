@@ -5,35 +5,27 @@ from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 from scrapy import signals
 
-from store_data import StoreData
+from surf_scrape.store_data import StoreData
 
 class SurfSpider(CrawlSpider):
 
     name = "surf_spider"
 
-    # TODO make this better
     # crawl outbound links up to this depth, to form a graph (hopefully)
     # depth 0-2 is already a lot of links, so that's all we're doing for now
     # now using depth middleware
-   
-
-    # TODO figure out how to crawl external links only, maybe through rules?
-    # TODO figure out how to use rule to only crawl external links
 
 
     # TODO figure out how to crawl amazon + other sites with robots.txt
     # can use a proxy, or make it look like a real user somehow?
     # rate limit?
+    # TODO update just use swft thing
 
-    # TODO look into ip ban
 
     rules = (
         Rule(LinkExtractor(allow=('amazon',))),
         Rule(LinkExtractor(allow=('prime',)))
     )
-
-    
-
     
     # a dict representing the connections between the urls
     urls = dict()
@@ -41,22 +33,20 @@ class SurfSpider(CrawlSpider):
     # root (starting) url
     root_url = None
 
-    def __init__(self, root_url):
+    def __init__(self, root_url='www.amazon.com'):
         self.root_url = root_url
 
-
     def error_handler(self, err):
-        print("an error happened")
+        print("error handler")
 
 
     def start_requests(self):
 
-
-        self.urls[root_url] = dict()
-        self.initialize_data(root_url, 0)
+        self.urls[self.root_url] = dict()
+        self.initialize_data(self.root_url, 0)
 
         yield scrapy.Request(
-            url=self.unparse(root_url),
+            url=self.unparse(self.root_url),
             headers = {'User-Agent': 'Mozilla/5.0'},
             callback=self.parse,
             errback=self.error_handler
@@ -73,8 +63,6 @@ class SurfSpider(CrawlSpider):
     def spider_closed(self, spider):
         spider.logger.info("spider closed %s", spider.name)
         self.crawl_finished()
-       
-    
 
     def crawl_url(self, url):
         if(self.urls[url]['depth'] < MAX_DEPTH):
@@ -95,7 +83,6 @@ class SurfSpider(CrawlSpider):
         source_url = response.url
         source_parser = urlparse(source_url)
         source_url_netloc = source_parser.netloc
-
 
         # ignore sites that have a different response from the link
         if(source_url_netloc not in self.urls.keys()):
@@ -128,24 +115,20 @@ class SurfSpider(CrawlSpider):
                     out_links.append(url_netloc)
 
                 # else doesnt have a netloc
-
-        
         
         for link in out_links:
 
             if link not in self.urls.keys():
                 # add the outbound link to the "graph"
                 if link not in self.urls[source_url_netloc]:
-                    self.urls[source_url_netloc]['data'].append(link)
+                    self.urls[source_url_netloc]['out_links'].append(link)
                 
-                # add the url to self.urls as a key
-                if link not in self.urls.keys():
-                    self.urls[link] = None
-
-                # crawl the outbound link
-                self.urls[link] = dict()
-                self.initialize_data(link, depth + 1)
-
+                if(link not in self.urls.keys()):
+                    # crawl the outbound link
+                    self.urls[link] = dict()
+                    self.initialize_data(link, depth + 1)
+                
+                self.urls[link]['in_links'].append(source_url_netloc)
 
                 yield scrapy.Request(
                     url=self.unparse(link), 
@@ -160,17 +143,15 @@ class SurfSpider(CrawlSpider):
         if 'www.' not in link:
             unparsed_link += "www."
 
-
         unparsed_link += link
         return unparsed_link
         
 
     def crawl_finished(self):
         # crawl is finished
-
-        StoreData(self.urls)
-          
         
+        pprint()
+        StoreData(self.urls)
 
     def get_cache(self):
         return self._cache
@@ -178,11 +159,21 @@ class SurfSpider(CrawlSpider):
         # parser = urlparse(url)
         # parser.netloc is same?
 
+    def pprint_urls(self):
+        for key in self.urls.keys():
+            print("we are here")
+            print("url: " + key + " depth: " + str(self.urls[key]['depth']))
+            print("in_links: " + str(self.urls[key]['in_links']))
+            print("out_links: " + str(self.urls[key]['out_links']))
+            print()
+            
+
     def initialize_data(self, dict_loc, depth):
         # initialize the data representation for each website/node
         # mainly doing this for depth (crawl to x depth)
         # for now, 'data' is just a list of the outbound links from a website
-        self.urls[dict_loc]['data'] = []
+        self.urls[dict_loc]['in_links'] = []
+        self.urls[dict_loc]['out_links'] = []
         self.urls[dict_loc]['depth'] = depth
 
         return
@@ -195,8 +186,3 @@ def runSpider():
     })
     process.crawl(SurfSpider, dict())
     process.start()
-
-
-
-if __name__ == "__main__":
-          

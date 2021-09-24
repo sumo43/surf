@@ -27,9 +27,12 @@ class StoreData():
     def __init__(self, crawl_data):
 
         self.crawl_data = crawl_data
-        print(crawl_data)
-        
-    
+        for key in crawl_data.keys():
+
+            print("in-links: ")
+            print([link for link in in_links])
+            print("out-links: ")
+
     
     # store cleaned meta data in meta_file
     def store_meta(self):
