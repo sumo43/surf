@@ -31,6 +31,8 @@ DOWNLOAD_DELAY = 2
 
 COOKIES_ENABLED = False
 
+LOG_LEVEL = 'INFO'
+
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'surf_scrape (+http://www.yourdomain.com)'
 

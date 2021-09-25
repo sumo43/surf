@@ -22,15 +22,15 @@ class StoreData():
     meta_path = os.path.join(data_dir, meta_file)
     schema_path = os.path.join(data_dir, schema_file)
     matrix_path = os.path.join(data_dir, matrix_file)
+<<<<<<< HEAD
 
+=======
+>>>>>>> a1cd3de6065ef2f09c622cd8ce29e9a21e171ef5
 
     def __init__(self, crawl_data):
 
         self.crawl_data = crawl_data
-        print(crawl_data)
-        
-    
-    
+
     # store cleaned meta data in meta_file
     def store_meta(self):
         return None
@@ -41,13 +41,12 @@ class StoreData():
         return None
 
     # store schema in json 
-    def store_scheme(self):
+    def store_schema(self):
         return None
 
     # generate numpy matrix of websites from pagerank
     def generate_matrix(self):
         return None
-
 
     # store matrix in csv form
     def store_matrix(self):
