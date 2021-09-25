@@ -19,7 +19,7 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.spidermiddlewares.depth.DepthMiddleware': 120,
 }
 
-DEPTH_LIMIT = 2
+DEPTH_LIMIT = 1
 
 
 SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
@@ -37,7 +37,7 @@ LOG_LEVEL = 'INFO'
 #USER_AGENT = 'surf_scrape (+http://www.yourdomain.com)'
 
 # Obey robots.txt rules
-ROBOTSTXT_OBEY = True
+ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
