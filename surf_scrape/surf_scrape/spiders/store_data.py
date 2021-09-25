@@ -22,10 +22,6 @@ class StoreData():
     meta_path = os.path.join(data_dir, meta_file)
     schema_path = os.path.join(data_dir, schema_file)
     matrix_path = os.path.join(data_dir, matrix_file)
-<<<<<<< HEAD
-
-=======
->>>>>>> a1cd3de6065ef2f09c622cd8ce29e9a21e171ef5
 
     def __init__(self, crawl_data):
 

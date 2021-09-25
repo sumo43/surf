@@ -7,6 +7,9 @@ from scrapy import signals
 
 from surf_scrape.store_data import StoreData
 
+import json
+import random
+
 class SurfSpider(CrawlSpider):
 
     name = "surf_spider"
@@ -32,6 +35,10 @@ class SurfSpider(CrawlSpider):
 
     # root (starting) url
     root_url = None
+    
+    # list of random proxies to not get blocked
+    # (shouldn't really need this)
+    proxies_list = []
 
     def __init__(self, root_url='www.amazon.com'):
         self.root_url = root_url
@@ -41,6 +48,9 @@ class SurfSpider(CrawlSpider):
 
 
     def start_requests(self):
+
+        self.init_random_proxy()
+        random_proxy = self.get_random_proxy()
 
         self.urls[self.root_url] = dict()
         self.initialize_data(self.root_url, 0)
@@ -149,9 +159,9 @@ class SurfSpider(CrawlSpider):
 
     def crawl_finished(self):
         # crawl is finished
-        
-        pprint()
-        StoreData(self.urls)
+       
+        self.pprint_urls()
+        #StoreData(self.urls)
 
     def get_cache(self):
         return self._cache
@@ -161,7 +171,6 @@ class SurfSpider(CrawlSpider):
 
     def pprint_urls(self):
         for key in self.urls.keys():
-            print("we are here")
             print("url: " + key + " depth: " + str(self.urls[key]['depth']))
             print("in_links: " + str(self.urls[key]['in_links']))
             print("out_links: " + str(self.urls[key]['out_links']))
@@ -176,7 +185,19 @@ class SurfSpider(CrawlSpider):
         self.urls[dict_loc]['out_links'] = []
         self.urls[dict_loc]['depth'] = depth
 
-        return
+
+    def init_random_proxy(self):
+        with open('proxies.json') as proxies_json:
+            proxies = json.load(proxies_json)
+
+            for proxy in proxies:
+                new_proxy = proxy['ip'] + ':' + proxy['port']
+                self.proxies_list.append(proxy['ip'] + ':' + proxy['port'])
+    
+    def get_random_proxy(self):
+
+        rand_ind = random.randrange(0, len(self.proxies_list))
+        return self.proxies_list[rand_ind]
 
 def runSpider():
     test_cache = dict()
