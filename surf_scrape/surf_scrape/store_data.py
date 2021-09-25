@@ -28,9 +28,19 @@ class StoreData():
         self.crawl_data = crawl_data
         for key in crawl_data.keys():
 
+            #skip small in_link and out_link counts
+
+            if(len(crawl_data[key]['in_links']) < 2 and len(crawl_data[key]['out_links']) < 2):
+                continue
+
+            print("url: " + key)
             print("in-links: ")
-            print([link for link in in_links])
+            print([in_link for in_link in crawl_data[key]['in_links']])
             print("out-links: ")
+            print([out_link for out_link in crawl_data[key]['out_links']])
+            print()
+            
+
 
     
     # store cleaned meta data in meta_file

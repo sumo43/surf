@@ -161,7 +161,7 @@ class SurfSpider(CrawlSpider):
         # crawl is finished
        
         self.pprint_urls()
-        #StoreData(self.urls)
+        StoreData(self.urls)
 
     def get_cache(self):
         return self._cache
@@ -176,7 +176,6 @@ class SurfSpider(CrawlSpider):
             print("out_links: " + str(self.urls[key]['out_links']))
             print()
             
-
     def initialize_data(self, dict_loc, depth):
         # initialize the data representation for each website/node
         # mainly doing this for depth (crawl to x depth)
@@ -184,7 +183,6 @@ class SurfSpider(CrawlSpider):
         self.urls[dict_loc]['in_links'] = []
         self.urls[dict_loc]['out_links'] = []
         self.urls[dict_loc]['depth'] = depth
-
 
     def init_random_proxy(self):
         with open('proxies.json') as proxies_json:
@@ -195,7 +193,6 @@ class SurfSpider(CrawlSpider):
                 self.proxies_list.append(proxy['ip'] + ':' + proxy['port'])
     
     def get_random_proxy(self):
-
         rand_ind = random.randrange(0, len(self.proxies_list))
         return self.proxies_list[rand_ind]
 

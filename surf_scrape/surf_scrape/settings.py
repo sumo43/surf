@@ -19,7 +19,7 @@ DOWNLOADER_MIDDLEWARES = {
     'scrapy.spidermiddlewares.depth.DepthMiddleware': 120,
 }
 
-DEPTH_LIMIT = 1
+DEPTH_LIMIT = 2
 
 
 SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
