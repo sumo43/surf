@@ -23,7 +23,6 @@ class StoreData():
     schema_path = os.path.join(data_dir, schema_file)
     matrix_path = os.path.join(data_dir, matrix_file)
 
-
     def __init__(self, crawl_data):
 
         self.crawl_data = crawl_data
