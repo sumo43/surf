@@ -4,8 +4,11 @@ from urllib.parse import urlparse
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 from scrapy import signals
+import sys
+import os
+import surf_spider
 
-from surf_scrape.store_data import StoreData
+from store_data import StoreData
 
 import json
 import random
@@ -52,16 +55,17 @@ class SurfSpider(CrawlSpider):
         self.init_random_proxy()
         random_proxy = self.get_random_proxy()
 
-        self.urls[self.root_url] = dict()
-        self.initialize_data(self.root_url, 0)
+        parsed_root_url = self.parse(self.root_url)
+
+        self.urls[parsed_root_url] = dict()
+        self.initialize_data(parsed_root_url, 0)
 
         yield scrapy.Request(
-            url=self.unparse(self.root_url),
+            url=self.unparse(parsed_root_url),
             headers = {'User-Agent': 'Mozilla/5.0'},
-            callback=self.parse,
+            callback=self.crawl_neighbors,
             errback=self.error_handler
         )
-    
 
     # use callback with spider_closed signal
     @classmethod
@@ -79,7 +83,7 @@ class SurfSpider(CrawlSpider):
             yield scrapy.Request(
                 url=url, 
                 headers={'User-Agent': 'Mozilla/5.0'},
-                callback=self.parse,
+                callback=self.crawl_neighbors,
                 errback=self.error_handler
             )
         else:
@@ -87,7 +91,7 @@ class SurfSpider(CrawlSpider):
             self.crawl_depth = 0
             return
 
-    def parse(self, response):
+    def crawl_neighbors(self, response):
 
         # parse the source url...
         source_url = response.url
@@ -128,9 +132,12 @@ class SurfSpider(CrawlSpider):
         
         for link in out_links:
 
+            link = parse(link)
+
             if link not in self.urls.keys():
                 # add the outbound link to the "graph"
                 if link not in self.urls[source_url_netloc]:
+                    
                     self.urls[source_url_netloc]['out_links'].append(link)
                 
                 if(link not in self.urls.keys()):
@@ -143,7 +150,7 @@ class SurfSpider(CrawlSpider):
                 yield scrapy.Request(
                     url=self.unparse(link), 
                     headers={'User-Agent': 'Mozilla/5.0'},
-                    callback=self.parse,
+                    callback=self.crawl_neighbors,
                     errback=self.error_handler
                 )
 
@@ -155,7 +162,11 @@ class SurfSpider(CrawlSpider):
 
         unparsed_link += link
         return unparsed_link
-        
+
+    def parse(self, link):
+        parsed_link = link.replace("www.", "")
+        return parsed_link
+            
 
     def crawl_finished(self):
         # crawl is finished
@@ -185,7 +196,7 @@ class SurfSpider(CrawlSpider):
         self.urls[dict_loc]['depth'] = depth
 
     def init_random_proxy(self):
-        with open('proxies.json') as proxies_json:
+        with open('../data/proxies.json') as proxies_json:
             proxies = json.load(proxies_json)
 
             for proxy in proxies:
