@@ -6,10 +6,8 @@
 # https://github.com/a5482pick/Python-Chrome-App-Native-Messaging/blob/master/Host/native-messaging-example-host
 # this is a test
 
-
-import struct
 import sys
-
+import struct
 
 def read_message():
     while True:
@@ -24,8 +22,6 @@ def read_message():
 
         # Read the text (JSON object) of the message.
         text = sys.stdin.read(text_length).decode('utf-8')
-
-        print("text is", text)
 
 
 def Main():
