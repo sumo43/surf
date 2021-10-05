@@ -1,0 +1,10 @@
+
+{
+    "name": "com.surf.surf_search",
+    "description": "Surf Search",
+    "path": "/Users/artem/Documents/projects/surf_dev/message.py",
+    "type": "stdio",
+    "allowed_origins": [
+      "chrome-extension://knldjmfmopnpolahpmmgbagdohdnhkik/"
+    ]
+  }

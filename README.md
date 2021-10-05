@@ -1,6 +1,6 @@
 # Surf Pi client
 
-util.py
+/Users/artem/Library/Application Support/Google/Chrome/NativeMessagingHosts
 
 - Url data structure for URL
     - figure out which metadata you want
