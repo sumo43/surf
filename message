@@ -4,6 +4,7 @@
 
 # adapted from: 
 # https://github.com/a5482pick/Python-Chrome-App-Native-Messaging/blob/master/Host/native-messaging-example-host
+# this is a test
 
 
 import struct
