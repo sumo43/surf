@@ -3,8 +3,8 @@ Table of Contents
 =======================
 
 * [What is surf?](#what-is-surf)
-* [Running on Linux](#running-on-mac-os)
-* [Running on PC](#running-on-linux)
+* [Running on Linux](#setup-on-mac-os)
+* [Running on PC](#setup-on-linux)
 * [Directory Structure](#directory-structure)
 * [Contributing](#contributing)
 
@@ -13,41 +13,36 @@ Table of Contents
 What is surf?(WIP)
 ------
 
-(WIP)
+Surf is a self-hosted search engine, which attempts to provide relevant search results based on pages similar to the ones you've already visited. Upon visiting a new webpage, the Surf web extension communicates the webpage to the surf back-end, which crawls the outbound links of the webpage and ranks them with PageRank.
 
-Running on Mac OS
+Setup on Mac OS
 ------
 
 ```
-./surf_install.sh
+./surf_install_macos.sh
 ```
 
 Running on Linux (WIP)
 ------
 
+```
+./surf_install_linux.sh
+```
+
 Directory Structure (WIP)
 ------
     
     ├── ext                 # Chrome / Firefox extensions for gathering searches
-    ├── scrape              # web scraper, to run in background
+    ├── crawl               # web crawler, to run in background
     ├── docs                # Documentation (WIP)
     ├── ui                  # web / app UI (WIP)
-    ├── logging             # logging
+    ├── data                # data folder for web crawler data. Can move this somewhere else upon install
+    ├── process_data        # python scripts for processing data (pagerank)
+    ├── logging             # logging web scraping + data processing(WIP)
     └── messaging           # internal IPC messaging between components (WIP)
-
-
 
 Contributing (WIP)
 ------
-
-/Users/artem/Library/Application Support/Google/Chrome/NativeMessagingHosts
-
-- Url data structure for URL
-    - figure out which metadata you want
-    - make this a dictionary, which will go into our list later
-    - figure out format
-
-    - RANKING - non query ranking - PageRank? - assign this later 
 
 - Store object 
     - Just a list for now
@@ -61,13 +56,6 @@ server.py
 # Web Crawler
 
     Scrapy Web Crawler, run through github workflow later
-
-- Look into amazon s3 storage or fileserver to store the crawled data
-- Look into what you want to store / what you need
-    - name, desc of website
-    - google analytics data of website through API?
-    - Format (JSON, Table?)
-
 
 # Web Crawler Pipeline
 - Flask app calls Crawler
