@@ -37,56 +37,20 @@ Directory Structure (WIP)
     ├── docs                # Documentation (WIP)
     ├── ui                  # web / app UI (WIP)
     ├── data                # data folder for web crawler data. Can move this somewhere else upon install
-    ├── process_data        # python scripts for processing data (pagerank)
+    ├── process_data        # python scripts for processing data (WIP)
     ├── logging             # logging web scraping + data processing(WIP)
     └── messaging           # internal IPC messaging between components (WIP)
 
 Contributing (WIP)
 ------
-
-- Store object 
-    - Just a list for now
-    - Future: implement priority queue for the ranking to display on server homepage
-    - Future: implement lambda sort by ranking
-
-server.py
-    - add good post request that handles the utils and sends them back to the client
-
-
-# Web Crawler
-
-    Scrapy Web Crawler, run through github workflow later
-
 # Web Crawler Pipeline
-- Flask app calls Crawler
+- crawler_handler script (running in backgroun) calls crawler:
 (Data from crawler) -> format_data.py -> matrix for pagerank -> mat.csv
                                       -> website metadata (later) -> meta.json
                                       -> schema.json for pagerank schema
 
 
    
-
-    Bonus Features
-    - Option to crawl sitemap for faster crawling
-
-
-# SQL server on Pi
-
-- Implement schema for SQL server
-- Add sites to the SQL server as they get added, adjust their visit count
-- Implement pagerank on a sql server
-- Implement search by keyword
-
-
-
-
-# PageRank
-
-- Figure out how to tie this to sql server
-
-
-FUTURE: one script that sets everything up 
-
 
 
 
