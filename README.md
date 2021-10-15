@@ -1,4 +1,44 @@
-# Surf Pi client
+
+Table of Contents
+=======================
+
+* [What is surf?](#what-is-surf)
+* [Running on Linux](#running-on-mac-os)
+* [Running on PC](#running-on-linux)
+* [Directory Structure](#directory-structure)
+* [Contributing](#contributing)
+
+------
+
+What is surf?(WIP)
+------
+
+(WIP)
+
+Running on Mac OS
+------
+
+```
+./surf_install.sh
+```
+
+Running on Linux (WIP)
+------
+
+Directory Structure (WIP)
+------
+    
+    ├── ext                 # Chrome / Firefox extensions for gathering searches
+    ├── scrape              # web scraper, to run in background
+    ├── docs                # Documentation (WIP)
+    ├── ui                  # web / app UI (WIP)
+    ├── logging             # logging
+    └── messaging           # internal IPC messaging between components (WIP)
+
+
+
+Contributing (WIP)
+------
 
 /Users/artem/Library/Application Support/Google/Chrome/NativeMessagingHosts
 
@@ -16,7 +56,6 @@
 
 server.py
     - add good post request that handles the utils and sends them back to the client
-
 
 
 # Web Crawler
