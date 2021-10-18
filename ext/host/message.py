@@ -7,6 +7,13 @@
 import sys
 import struct
 
+def send_message(message):
+    
+    sys.stdout.write(struct.path('I', len(message)))
+
+    sys.stdout.write(message)
+
+    sys.stdout.flush()
 
 def read_message():
     message_number = 0
@@ -25,7 +32,9 @@ def read_message():
                 queue.put(text)
         else:
             # In headless mode just send an echo message back.
-            send_message('{"echo": %s}' % text)
+            with open("test-file.json", "w") as file:
+                file.write(text)
+                send_message('{"echo": %s}' % text)
 
 
 

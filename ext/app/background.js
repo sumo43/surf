@@ -6,9 +6,14 @@ chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
 
     port = chrome.runtime.connectNative('com.surf.surf_search')
 
+
+    port.onMessage.addListener(function(msg) {
+      console.log("Received: " + msg)
+    })
+
     console.log("the url is " + url)
 
-    port.postMessage({text: text_string})
+    port.postMessage({text: "This Works!"})
 })
 
 /**

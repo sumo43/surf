@@ -3,7 +3,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 set -e
-DIR="$( cd "$( dirname "$0" )" && pwd )"
+DIR="$( cd "$( dirname "$0" )" && pwd )" 
+DIR+="/host"
 if [ "$(uname -s)" == "Darwin" ]; then
   if [ "$(whoami)" == "root" ]; then
     TARGET_DIR="/Library/Google/Chrome/NativeMessagingHosts"
@@ -32,7 +33,7 @@ sed -i -e "s/HOST_PATH/$ESCAPED_HOST_PATH/" "$TARGET_DIR/_$HOST_NAME.json"
 chmod o+r "$TARGET_DIR/$HOST_NAME.json"
 echo "Native messaging host $HOST_NAME has been installed at $TARGET_DIR/$HOST_NAME.json"
 
+pyinstaller --onefile host/message.py 
 
-pyinstaller --onefile message.py && mv dist/message message && rm -rf dist build 
-rm -rf __pycache__
-
+mv dist/message message 
+rm -rf dist build __pycache__ message.spec

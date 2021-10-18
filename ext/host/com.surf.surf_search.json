@@ -5,10 +5,10 @@
 {
   "name": "com.surf.surf_search",
   "description": "Surf Search Chrome Plugin",
-  "path": "/Users/artem/Documents/fun/surf/ext/message",
+  "path": "/Users/artem/Documents/fun/surf/ext/host/message",
   "type": "stdio",
   "allowed_origins": [
-    "chrome-extension://honckghnaalbocjingbhjdldjlhinlmg/"
+    "chrome-extension://lbkgljodilaabficbolglfhonchlmead/"
   ]
 }
 
