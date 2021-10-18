@@ -36,4 +36,5 @@ echo "Native messaging host $HOST_NAME has been installed at $TARGET_DIR/$HOST_N
 pyinstaller --onefile host/message.py 
 
 mv dist/message message 
-rm -rf dist build __pycache__ message.spec
+rm -rf dist build host/__pycache__ message.spec
+mv message host

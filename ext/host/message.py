@@ -6,44 +6,30 @@
 
 import sys
 import struct
+import traceback
+import nativemessaging
 
 def send_message(message):
-    
-    sys.stdout.write(struct.path('I', len(message)))
-
-    sys.stdout.write(message)
-
-    sys.stdout.flush()
+    message = nativemessaging.encode_message(message)
+    nativemessaging.send_message(message)
 
 def read_message():
-    message_number = 0
     while 1:
-        # Read the message length (first 4 bytes).
-        text_length_bytes = sys.stdin.read(4)
-        if len(text_length_bytes) == 0:
-            if queue:
-                queue.put(None)
-            sys.exit(0)
-            # Unpack message length as 4 byte integer.
-            text_length = struct.unpack('i', text_length_bytes)[0]
-            # Read the text (JSON object) of the message.
-            text = sys.stdin.read(text_length).decode('utf-8')
-            if queue:
-                queue.put(text)
-        else:
-            # In headless mode just send an echo message back.
-            with open("test-file.json", "w") as file:
-                file.write(text)
-                send_message('{"echo": %s}' % text)
+        message = nativemessaging.get_message()
+        with open('file.txt', 'w') as f:
+            f.write(str(message))
 
 
 
-def Main():
+
+
+def main():
+    
     read_message()
 
 
 if __name__ == "__main__":
-    Main()
+    main()
 
 
 
