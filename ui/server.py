@@ -1,24 +1,3 @@
-from flask import Flask, request, render_template
-from urllib.parse import urlparse
-import crawl
-import zerorpc
-
-
-class WebsiteHandler(object):
-    def printWesiteName(self, websiteName : str):
-        print(websiteName)
-
-    def websiteHandler(self, websiteName : str):
-    
-        # TODO make the website name into a dict with useful info
-
-
-        return
-    
-
-    def dataHandler(self, data : dict):
-        return
-
 app = Flask(__name__)
 
 # pass the list of page, name, desc to the html 
@@ -67,19 +46,3 @@ def root_handler():
         #add the link to the database, search its roots if within 3deg of sep
 
     return "url " + parsed_url + " has been received"
-
-
-if __name__ == '__main__':
-
-    website_server = zerorpc.Server(WebsiteHandler())
-    website_server.bind("tcp://0.0.0.0:4241")
-    website_server.run()
-
-    spider = SurfSpider(_cache)
-
-    app.run()
-
-
-
-
-
