@@ -3,7 +3,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 set -e
-DIR="$( cd "$( dirname "$0" )" && pwd )"
+DIR="$( cd "$( dirname "$0" )" && pwd )" 
+DIR+="/host"
 if [ "$(uname -s)" == "Darwin" ]; then
   if [ "$(whoami)" == "root" ]; then
     TARGET_DIR="/Library/Google/Chrome/NativeMessagingHosts"
@@ -17,6 +18,8 @@ else
     TARGET_DIR="$HOME/.config/google-chrome/NativeMessagingHosts"
   fi
 fi
+
+
 HOST_NAME=com.surf.surf_search
 # Create directory to store native messaging host.
 mkdir -p "$TARGET_DIR"
@@ -25,12 +28,13 @@ cp "$DIR/$HOST_NAME.json" "$TARGET_DIR"
 # Update host path in the manifest.
 HOST_PATH=$DIR/native-messaging-example-host
 ESCAPED_HOST_PATH=${HOST_PATH////\\/}
-sed -i -e "s/HOST_PATH/$ESCAPED_HOST_PATH/" "$TARGET_DIR/$HOST_NAME.json"
+sed -i -e "s/HOST_PATH/$ESCAPED_HOST_PATH/" "$TARGET_DIR/_$HOST_NAME.json"
 # Set permissions for the manifest so that all users can read it.
 chmod o+r "$TARGET_DIR/$HOST_NAME.json"
-echo "Native messaging host $HOST_NAME has been installed."
+echo "Native messaging host $HOST_NAME has been installed at $TARGET_DIR/$HOST_NAME.json"
 
+pyinstaller --onefile host/message.py 
 
-pyinstaller --onefile message.py && mv dist/message message && rm -rf dist build 
-rm -rf __pycache__
-
+mv dist/message message 
+rm -rf dist build host/__pycache__ message.spec
+mv message host

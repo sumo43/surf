@@ -1,13 +1,23 @@
 from flask import Flask, request, render_template
-from store import Store
 from urllib.parse import urlparse
-from spider import SurfSpider
+import crawl
+import zerorpc
 
-cache = Store()
 
-_cache = dict()
+class WebsiteHandler(object):
+    def printWesiteName(self, websiteName : str):
+        print(websiteName)
 
-spider = SurfSpider(_cache)
+    def websiteHandler(self, websiteName : str):
+    
+        # TODO make the website name into a dict with useful info
+
+
+        return
+    
+
+    def dataHandler(self, data : dict):
+        return
 
 app = Flask(__name__)
 
@@ -60,6 +70,13 @@ def root_handler():
 
 
 if __name__ == '__main__':
+
+    website_server = zerorpc.Server(WebsiteHandler())
+    website_server.bind("tcp://0.0.0.0:4241")
+    website_server.run()
+
+    spider = SurfSpider(_cache)
+
     app.run()
 
 
