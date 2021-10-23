@@ -1,17 +1,23 @@
 from flask import Flask, request, render_template
 from urllib.parse import urlparse
-import crawl
+from crawl.spiders.surf_crawler import SurfCrawler, runCrawler
 import zerorpc
 
 class WebsiteHandler(object):
+
+    def __init__(self):
+        super(WebsiteHandler, self).__init__() 
+        
     def printWebsiteName(self, websiteName : str):
         print(websiteName)
 
-    def websiteHandler(self, websiteName : str):
+    def websiteHandler(self, website : dict):
     
         # TODO make the website name into a dict with useful info
-        
-        print("website received, ", websiteName)
+
+        print("site:", website['text'])
+
+        runCrawler(website['text'])
 
         return
     

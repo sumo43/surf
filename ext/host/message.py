@@ -15,7 +15,6 @@ import zerorpc
 c = zerorpc.Client()
 c.connect("tcp://127.0.0.1:4001")
 
-
 def send_message(message):
     message = nativemessaging.encode_message(message)
     nativemessaging.send_message(message)
@@ -25,7 +24,7 @@ def handle_message(message):
 
 def read_message():
     while 1:
-        message = nativemessaging.get_message()
+        message = dict(nativemessaging.get_message())
         handle_message(message)
 
 def main():

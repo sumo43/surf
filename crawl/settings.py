@@ -7,10 +7,10 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
-BOT_NAME = 'surf_scrape'
+BOT_NAME = 'surf_crawl'
 
-SPIDER_MODULES = ['surf_scrape.spiders']
-NEWSPIDER_MODULE = 'surf_scrape.spiders'
+SPIDER_MODULES = ['surf_crawl.spiders']
+NEWSPIDER_MODULE = 'surf_crawl.spiders'
 
 DOWNLOADER_MIDDLEWARES = {
     'scrapy.downloadermiddlewares.retry.RetryMiddleware': 90,
