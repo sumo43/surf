@@ -9,19 +9,24 @@ import struct
 import traceback
 import nativemessaging
 
+import zerorpc
+
+# assumes that main.py is running in the background
+c = zerorpc.Client()
+c.connect("tcp://127.0.0.1:4001")
+
+
 def send_message(message):
     message = nativemessaging.encode_message(message)
     nativemessaging.send_message(message)
 
+def handle_message(message):
+    c.websiteHandler(message)
+
 def read_message():
     while 1:
         message = nativemessaging.get_message()
-        with open('file.txt', 'w') as f:
-            f.write(str(message))
-
-
-
-
+        handle_message(message)
 
 def main():
     

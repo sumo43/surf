@@ -3,15 +3,15 @@ from urllib.parse import urlparse
 import crawl
 import zerorpc
 
-
 class WebsiteHandler(object):
-    def printWesiteName(self, websiteName : str):
+    def printWebsiteName(self, websiteName : str):
         print(websiteName)
 
     def websiteHandler(self, websiteName : str):
     
         # TODO make the website name into a dict with useful info
-
+        
+        print("website received, ", websiteName)
 
         return
     
@@ -72,7 +72,7 @@ def root_handler():
 if __name__ == '__main__':
 
     website_server = zerorpc.Server(WebsiteHandler())
-    website_server.bind("tcp://0.0.0.0:4241")
+    website_server.bind("tcp://0.0.0.0:4001")
     website_server.run()
 
     spider = SurfSpider(_cache)
