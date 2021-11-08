@@ -29,10 +29,6 @@ class SurfCrawler(CrawlSpider):
     # rate limit?
     # TODO update just use swft thing
 
-    rules = (
-        Rule(LinkExtractor(allow=('amazon',))),
-        Rule(LinkExtractor(allow=('prime',)))
-    )
     
     # a dict representing the connections between the urls
     urls = dict()
@@ -52,6 +48,9 @@ class SurfCrawler(CrawlSpider):
         
         self.root_url = kw.get('domain')
 
+
+        self.root_url = 'amazon.com'
+
     def error_handler(self, err):
         print("error handler")
 
@@ -62,6 +61,9 @@ class SurfCrawler(CrawlSpider):
         # random_proxy = self.get_random_proxy()
 
         parsed_root_url = self.parse(self.root_url)
+
+
+        print(parsed_root_url)
 
         self.urls[parsed_root_url] = dict()
         self.initialize_data(parsed_root_url, 0)
@@ -178,7 +180,7 @@ class SurfCrawler(CrawlSpider):
         # crawl is finished
        
         self.pprint_urls()
-        StoreData(self.urls)
+        #StoreData(self.urls)
 
     def get_cache(self):
         return self._cache
