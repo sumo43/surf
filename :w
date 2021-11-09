@@ -1,0 +1,5 @@
+from crawl.spiders.surf_crawler import SurfCrawler, runCrawler
+
+
+
+crawler = RunCrawler("www.amazon.com")

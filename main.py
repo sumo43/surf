@@ -16,11 +16,9 @@ class WebsiteHandler(object):
         # TODO make the website name into a dict with useful info
 
         print("site:", website['text'])
-
         runCrawler(website['text'])
 
         return
-    
 
     def dataHandler(self, data : dict):
         return

@@ -27,24 +27,36 @@ class StoreData():
     schema_path = os.path.join(data_dir, schema_file)
     matrix_path = os.path.join(data_dir, matrix_file)
 
-
     # store_data uses local storage for now, but will use a json-like backend
     # like firebase later
     # data is stored in 
 
     def __init__(self, crawl_data):
-        
+
         for key in crawl_data.keys():
             if(len(crawl_data[key]['in_links']) < 2 and len(crawl_data[key]['out_links']) < 2):
                 continue
             else:
                 self.new_entries[key] = crawl_data[key]
-        
+
+        self.meta_path = os.getcwd() + '/data/meta.json'
         self.store_meta()
+        #self.pprint_meta()
+
+    def pprint_meta(self):
+        
+        with open(self.meta_path, 'r') as meta_file:
+            meta_dict = json.load(meta_file)
+
+            for key, value in meta_dict.items():
+                print(f'{key}, {value}')
+            
+      
     
     # store cleaned meta data in meta_file
     def store_meta(self):
-        print(os.getcwd())
+        
+        self.meta_path = os.getcwd() + '/data/meta.json'
         with open(self.meta_path, 'r') as meta_file:
 
             try:
@@ -53,7 +65,6 @@ class StoreData():
                 self.meta_dict = dict()
 
         meta_keys = self.meta_dict.keys()
-
 
         for key in self.new_entries.keys():
             if key in self.meta_dict:

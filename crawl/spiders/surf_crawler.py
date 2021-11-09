@@ -1,11 +1,11 @@
-import scrapy
-from scrapy.spiders import CrawlSpider, Rule
 from urllib.parse import urlparse
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 from scrapy import signals
+import scrapy
 
 from scrapy.utils.project import get_project_settings
+from scrapy.spiders import CrawlSpider
 
 import sys
 import os
@@ -15,6 +15,10 @@ from .store_data import StoreData
 import json
 import random
 
+
+
+MAX_DEPTH = 2
+
 class SurfCrawler(CrawlSpider):
 
     name = "surf_spider"
@@ -23,12 +27,10 @@ class SurfCrawler(CrawlSpider):
     # depth 0-2 is already a lot of links, so that's all we're doing for now
     # now using depth middleware
 
-
     # TODO figure out how to crawl amazon + other sites with robots.txt
     # can use a proxy, or make it look like a real user somehow?
     # rate limit?
     # TODO update just use swft thing
-
     
     # a dict representing the connections between the urls
     urls = dict()
@@ -48,9 +50,6 @@ class SurfCrawler(CrawlSpider):
         
         self.root_url = kw.get('domain')
 
-
-        self.root_url = 'amazon.com'
-
     def error_handler(self, err):
         print("error handler")
 
@@ -60,16 +59,11 @@ class SurfCrawler(CrawlSpider):
         # self.init_random_proxy()
         # random_proxy = self.get_random_proxy()
 
-        parsed_root_url = self.parse(self.root_url)
-
-
-        print(parsed_root_url)
-
-        self.urls[parsed_root_url] = dict()
-        self.initialize_data(parsed_root_url, 0)
+        self.urls[self.root_url] = dict()
+        self.initialize_data(self.root_url, 0)
 
         yield scrapy.Request(
-            url=self.unparse(parsed_root_url),
+            url=self.unparse(self.root_url),
             headers = {'User-Agent': 'Mozilla/5.0'},
             callback=self.crawl_neighbors,
             errback=self.error_handler
@@ -106,9 +100,10 @@ class SurfCrawler(CrawlSpider):
         source_parser = urlparse(source_url)
         source_url_netloc = source_parser.netloc
 
+        print(source_url_netloc)
+
         # ignore sites that have a different response from the link
         if(source_url_netloc not in self.urls.keys()):
-            print(source_url_netloc)
             print("buggy url")
             return
 
@@ -140,7 +135,6 @@ class SurfCrawler(CrawlSpider):
         
         for link in out_links:
 
-            link = parse(link)
 
             if link not in self.urls.keys():
                 # add the outbound link to the "graph"
@@ -155,12 +149,15 @@ class SurfCrawler(CrawlSpider):
                 
                 self.urls[link]['in_links'].append(source_url_netloc)
 
-                yield scrapy.Request(
-                    url=self.unparse(link), 
-                    headers={'User-Agent': 'Mozilla/5.0'},
-                    callback=self.crawl_neighbors,
-                    errback=self.error_handler
-                )
+
+                if(self.urls[link]['depth'] <= MAX_DEPTH):
+
+                    yield scrapy.Request(
+                        url=self.unparse(link), 
+                        headers={'User-Agent': 'Mozilla/5.0'},
+                        callback=self.crawl_neighbors,
+                        errback=self.error_handler
+                    )
 
 
     def unparse(self, link):
@@ -174,13 +171,12 @@ class SurfCrawler(CrawlSpider):
     def parse(self, link):
         parsed_link = link.replace("www.", "")
         return parsed_link
-            
 
     def crawl_finished(self):
         # crawl is finished
        
         self.pprint_urls()
-        #StoreData(self.urls)
+        StoreData(self.urls)
 
     def get_cache(self):
         return self._cache
