@@ -1,32 +1,33 @@
 from flask import Flask, request, render_template
 from urllib.parse import urlparse
-from crawl.crawler_requests import SurfCrawler
+from crawl.spiders.surf_crawler import SurfCrawler, runCrawler
 import zerorpc
 
-def process_site(website : str):
-    
-    website = website.replace("https://", "")
-    website = website.replace("http://", "")
-
-    if(website[len(website) - 1] == '/'):
-        website = website[:len(website) - 1]
-
-    return website
+def process_site(self, website : str):
+        website.replace('https://', '')
+        website = 'https://' + 'www.' + website
+        return website
 
 class WebsiteHandler(object):
 
     def __init__(self):
         super(WebsiteHandler, self).__init__() 
-        self.crawler = SurfCrawler()
         
-    def websiteHandler(self, website : dict):
+    def printWebsiteName(self, websiteName : str):
+        print(websiteName)
+
+        def websiteHandler(self, website : dict):
     
         # TODO make the website name into a dict with useful info
-
+        
         processed_site = process_site(website['text'])
+        print("site:", website['text'])
+        #runCrawler(website['text'])
 
-        print(f"Received new link: {processed_site}")
-        self.crawler.run(processed_site)
+        return
+
+    def dataHandler(self, data : dict):
+        return
 
 app = Flask(__name__)
 
@@ -80,8 +81,20 @@ def root_handler():
 
 if __name__ == '__main__':
 
+
+    print(process_site('mail.google.com'))
+    """
+
     website_server = zerorpc.Server(WebsiteHandler())
     website_server.bind("tcp://0.0.0.0:4001")
     website_server.run()
 
+    spider = SurfSpider(_cache)
+
     app.run()
+    """
+
+
+
+
+

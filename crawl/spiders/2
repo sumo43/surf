@@ -2,30 +2,40 @@ from urllib.parse import urlparse
 from scrapy.crawler import CrawlerProcess
 from scrapy.linkextractors import LinkExtractor
 from scrapy import signals
+import scrapy
+
 from scrapy.utils.project import get_project_settings
 from scrapy.spiders import CrawlSpider
-from scrapy.crawler import Crawler
-from billiard import Process
-from twisted.internet import reactor
-from .store_data import StoreData
 
-import scrapy
 import sys
 import os
+
+from twisted.internet import reactor
+
+from .store_data import StoreData
+
 import json
 import random
-
-from subprocess import Popen, PIPE
 
 MAX_DEPTH = 2
 
 class SurfCrawler(CrawlSpider):
 
     name = "surf_spider"
+
+    # crawl outbound links up to this depth, to form a graph (hopefully)
+    # depth 0-2 is already a lot of links, so that's all we're doing for now
+    # now using depth middleware
+
+    # TODO figure out how to crawl amazon + other sites with robots.txt
+    # can use a proxy, or make it look like a real user somehow?
+    # rate limit?
+    # TODO update just use swft thing
+    
+    # a dict representing the connections between the urls
     urls = dict()
 
     # root (starting) url
-
     root_url = None
     
     # list of random proxies to not get blocked
@@ -34,28 +44,20 @@ class SurfCrawler(CrawlSpider):
 
     def __init__(self, **kw):
         super(SurfCrawler, self).__init__(**kw)
+
         if not kw.get('domain'):
             return
+        
         self.root_url = kw.get('domain')
 
-    def start(self, url : str):
-        self.root_url = url
-        self.initialize_data(self.root_url, 0)
-        
-        print("started\n\n\n\n\n\n\n\n\n")
-        # random_proxy = self.get_random_proxy()
+    def error_handler(self, err):
+        print("error handler")
 
-        self.urls[self.root_url] = dict()
-        self.initialize_data(self.root_url, 0)
-
-        yield scrapy.Request(
-            url=self.root_url,
-            headers = {'User-Agent': 'Mozilla/5.0'},
-            callback=self.crawl_neighbors,
-            errback=self.error_handler
-        )
 
     def start_requests(self):
+
+        # self.init_random_proxy()
+        # random_proxy = self.get_random_proxy()
 
         self.urls[self.root_url] = dict()
         self.initialize_data(self.root_url, 0)
@@ -67,6 +69,7 @@ class SurfCrawler(CrawlSpider):
             errback=self.error_handler
         )
 
+    # use callback with spider_closed signal
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super(CrawlSpider, cls).from_crawler(crawler, *args, **kwargs)
@@ -76,6 +79,19 @@ class SurfCrawler(CrawlSpider):
     def spider_closed(self, spider):
         spider.logger.info("spider closed %s", spider.name)
         self.crawl_finished()
+
+    def crawl_url(self, url):
+        if(self.urls[url]['depth'] < MAX_DEPTH):
+            yield scrapy.Request(
+                url=url, 
+                headers={'User-Agent': 'Mozilla/5.0'},
+                callback=self.crawl_neighbors,
+                errback=self.error_handler
+            )
+        else:
+            print("maximum crawl depth exceeded")
+            self.crawl_depth = 0
+            return
 
     def crawl_neighbors(self, response):
 
@@ -141,8 +157,12 @@ class SurfCrawler(CrawlSpider):
                         errback=self.error_handler
                     )
 
+
     def unparse(self, link):
         unparsed_link = "https://"
+        if 'www.' not in link:
+            unparsed_link += "www."
+
         unparsed_link += link
         return unparsed_link
 
@@ -152,11 +172,15 @@ class SurfCrawler(CrawlSpider):
 
     def crawl_finished(self):
         # crawl is finished
-
-        print("crawl is finished")
        
         self.pprint_urls()
         StoreData(self.urls)
+
+    def get_cache(self):
+        return self._cache
+
+        # parser = urlparse(url)
+        # parser.netloc is same?
 
     def pprint_urls(self):
         for key in self.urls.keys():
@@ -173,38 +197,36 @@ class SurfCrawler(CrawlSpider):
         self.urls[dict_loc]['out_links'] = []
         self.urls[dict_loc]['depth'] = depth
 
-    def error_handler(self, err):
-        print("there was an error...")
-        print(err)
+    def init_random_proxy(self):
+        with open('../data/proxies.json') as proxies_json:
+            proxies = json.load(proxies_json)
 
-class CrawlerRunner(Process):
+            for proxy in proxies:
+                new_proxy = proxy['ip'] + ':' + proxy['port']
+                self.proxies_list.append(proxy['ip'] + ':' + proxy['port'])
+    
+    def get_random_proxy(self):
+        rand_ind = random.randrange(0, len(self.proxies_list))
+        return self.proxies_list[rand_ind]
 
-    def __init__(self, spider):
-        Process.__init__(self)
-        settings = get_project_settings()
-        self.crawler_process = CrawlerProcess(settings)
-        self.crawler = self.crawler_process.create_crawler(SurfCrawler)
-        self.crawler.signals.connect(reactor.stop, signal=signals.spider_closed)
-        self.spider = spider
 
-    def run(self):
-        self.crawler.crawl(self.spider)
-        self.crawler.start()
-        self.crawler.join()
+class CrawlerRunner:
 
-def execute_crawler(url):
+    def __init__(self):
+        self.process = CrawlerProcess(get_project_settings())
+        self.process.start()
 
-    print("Executing new crawler...")
+    def crawl(self, startingUrl : str):
+        self.process.crawl(SurfCrawler, domain=startingUrl)
+"""
+def runCrawler(startingUrl : str):
+
     process = CrawlerProcess(get_project_settings())
-    process.crawl(SurfCrawler, domain=url)
+    d = process.crawl(SurfCrawler, domain=startingUrl)
     process.start()
 
-def run_spider(url):
-    p = Process(target=execute_crawler, args=(url,))  
-    p.start()
-    p.join()
-
-
-
+    process.stop()
+    reactor.stop()
+"""
 
 

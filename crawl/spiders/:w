@@ -19,6 +19,12 @@ from subprocess import Popen, PIPE
 
 MAX_DEPTH = 2
 
+
+
+class SurfCrawler:
+    
+    def __init__(self):
+
 class SurfCrawler(CrawlSpider):
 
     name = "surf_spider"
