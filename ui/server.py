@@ -1,3 +1,7 @@
+from flask import Flask, render_template
+
+
+
 app = Flask(__name__)
 
 # pass the list of page, name, desc to the html 

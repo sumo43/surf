@@ -16,7 +16,7 @@
   <link rel="apple-touch-icon" href="icon.png">
   <!-- Place favicon.ico in the root directory -->
 
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="index.css">
 
   <meta name="theme-color" content="#fafafa">
 </head>
@@ -32,20 +32,14 @@
     <div class="container">
         <div class="row"> 
             <h1> Surf search </h1>
-            <div class="col">
-                {% for key in _cache.keys() %}
-                    <p> url: {{ key }} </p>
-                    {% for url in _cache[key] %} 
-                        <p> links to: {{ url }} </p>
-                    {% endfor %}
-                {% endfor %}
+            <div class="col" id="search_list">
+                
             </div>
 
         </div>
     </div>
-    
-  
-
+    <script src='index.js'>
+    </script>
 </body>
 
 </html>
