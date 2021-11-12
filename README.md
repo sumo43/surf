@@ -13,7 +13,8 @@ Table of Contents
 What is surf?(WIP)
 ------
 
-Surf is a self-hosted search engine, which attempts to provide relevant search results based on pages similar to the ones you've already visited. Upon visiting a new webpage, the Surf web extension communicates the webpage to the surf back-end, which crawls the outbound links of the webpage and ranks them with PageRank.
+Surf is a self-hosted search engine, which attempts to provide relevant search results based on pages similar to the ones you've already visited. Upon visiting a new webpage, the Surf web extension communicates the webpage to the surf back-end, which crawls the outbound links of the webpage and ranks them using
+PageRank.
 
 Setup on Mac OS
 ------
