@@ -2,21 +2,23 @@ import numpy as np
 from fast_pagerank import pagerank_power
 from scipy import sparse
 import json
-from urllib.parse import urlparse
 
 
-def generate_index(websites_dict: dict):
-    reverse_index = {}
-    index = []
-
+def generate_reverse_index(websites_dict: dict):
+    index = {}
     ind = 0
     for item in websites_dict.keys():
-        reverse_index[item] = ind
+        index[item] = ind
         ind += 1
+    return reverse_index, index
 
-        index.append(item)
+def generate_index(websites_dict: dict):
 
-    return index, reverse_index
+    li = []
+    
+    for item in websites_dict.keys():
+        li.append(item)
+        
 
 def generate_relational_matrix(index: dict, websites_dict: dict):
     mat_size = len(index)
@@ -66,27 +68,27 @@ def test_pagerank():
 def run_pagerank():
     
     META_DICT = "../data/meta.json"
-    RANK_DICT = "../data/ranks.json"
 
     with open(META_DICT, 'r') as meta_file:
         print('loading json...')
         dictionary = json.load(meta_file)
     
     print('making index...')
-    ind, ind_rev = generate_index(dictionary)
+    ind_rev = generate_reverse_index(dictionary)
+
+    ind = generate_index(dictionary)
     
     print('making relational matrix...')
-    mat = generate_relational_matrix(ind_rev, dictionary)
+    mat = generate_relational_matrix(ind, dictionary)
 
     print('running pagerank...')
     ranks = pagerank(mat)
     
-    sorted_ranks = list(ranks.argsort())
-    sorted_ranks = list(map(lambda a: ind[a].split('/')[0], sorted_ranks))
 
-    with open(RANK_DICT, 'w') as rank_file:
-        
-        rank_file.write(json.dumps(sorted_ranks))
-    
+    s = ranks.argsort()[:5]
+    for i in s:
+        print(ind[i])
+
+
 if __name__ == "__main__":
     run_pagerank()
