@@ -1,8 +1,19 @@
-const sendMessage = (url) => {
 
+const sendMessage = (url) => {
     chrome.extension.sendMessage({parameter: url}, () => {
-        console.log("url sent " + url)
+        if(chrome.runtime.lastError) {
+            console.log("error, check client")
+        }
+        else {
+            console.log("url sent " + url)
+        }
     })
 }
 
-sendMessage(location.href)
+try {
+    sendMessage(location.href)
+}
+catch(error) {
+    console.log("erorr")
+    console.log(error)
+}
