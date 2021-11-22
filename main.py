@@ -2,6 +2,8 @@ from flask import Flask, request, render_template
 from urllib.parse import urlparse
 from crawl.crawler_requests import SurfCrawler
 import zerorpc
+import zmq
+import atexit
 
 def process_site(website : str):
     
@@ -77,11 +79,14 @@ def root_handler():
 
     return "url " + parsed_url + " has been received"
 
-
 if __name__ == '__main__':
-
-    website_server = zerorpc.Server(WebsiteHandler())
-    website_server.bind("tcp://0.0.0.0:4001")
-    website_server.run()
-
-    app.run()
+    try:
+        website_server = zerorpc.Server(WebsiteHandler())
+        website_server.bind("tcp://0.0.0.0:4001")
+        website_server.run()
+        def exit_handler():
+            with open("file.txt", "w") as file:
+                file.write("aaa")
+        atexit.register(exit_handler)
+    except zmq.error.ZMQError:
+        print("Socket already in use, is the server already running?") 

@@ -8,12 +8,20 @@ import sys
 import struct
 import traceback
 import nativemessaging
-
 import zerorpc
+import atexit
 
 # assumes that main.py is running in the background
-c = zerorpc.Client()
-c.connect("tcp://127.0.0.1:4001")
+try:
+    c = zerorpc.Client()
+    c.connect("tcp://127.0.0.1:4001")
+    def exit_handler():
+        c.close()
+    atexit.register(exit_handler)
+except Exception as e:
+    c.close()
+finally:
+    c.close()
 
 def send_message(message):
     message = nativemessaging.encode_message(message)
@@ -28,7 +36,6 @@ def read_message():
         handle_message(message)
 
 def main():
-    
     read_message()
 
 
