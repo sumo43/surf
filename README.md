@@ -44,11 +44,18 @@ Directory Structure (WIP)
 
 Contributing (WIP)
 ------
+
+
+
+
 # Web Crawler Pipeline
 - crawler_handler script (running in backgroun) calls crawler:
 (Data from crawler) -> format_data.py -> matrix for pagerank -> mat.csv
                                       -> website metadata (later) -> meta.json
                                       -> schema.json for pagerank schema
+
+# todo
+- Add installation script for linux, should work about the same as mac
 
 
    
